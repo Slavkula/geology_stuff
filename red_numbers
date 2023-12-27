@@ -1,0 +1,66 @@
+import tkinter as tk
+from docx import Document
+
+def generate_macro():
+    peremen1 = page_name_entry.get()
+    peremen2 = start_cell_entry.get()
+    peremen3 = end_cell_entry.get()
+    peremen4 = column_entry.get()
+    peremen5 = hundred_column_entry.get()
+
+    macro_code = f'''Sub КрасныеЧисла()
+    Dim ws As Worksheet
+    Dim i As Long
+    Set ws = ThisWorkbook.Sheets("{peremen1}")
+
+    For i = {peremen2} To {peremen3}
+        Dim originalValue As Variant
+        Dim adjustedValue As Double
+
+        originalValue = ws.Cells(i, "{peremen5}").Value
+        If IsNumeric(originalValue) Then
+            adjustedValue = 100 - originalValue
+            ws.Cells(i, "{peremen4}").Value = ws.Cells(i, "{peremen4}").Value + adjustedValue
+        End If
+    Next i
+End Sub'''
+
+    document = Document()
+    document.add_paragraph(macro_code)
+    document.save('макрос.docx')
+
+root = tk.Tk()
+root.title("Macro Generator")
+
+page_name_label = tk.Label(root, text="Имя листа:")
+page_name_label.pack()
+page_name_entry = tk.Entry(root)
+page_name_entry.pack()
+
+start_cell_label = tk.Label(root, text="Первая ячейка:")
+start_cell_label.pack()
+start_cell_entry = tk.Entry(root)
+start_cell_entry.pack()
+
+end_cell_label = tk.Label(root, text="Последняя:")
+end_cell_label.pack()
+end_cell_entry = tk.Entry(root)
+end_cell_entry.pack()
+
+column_label = tk.Label(root, text="Столбец для замены:")
+column_label.pack()
+column_entry = tk.Entry(root)
+column_entry.pack()
+
+hundred_column_label = tk.Label(root, text="Столбец, в котором красные числа:")
+hundred_column_label.pack()
+hundred_column_entry = tk.Entry(root)
+hundred_column_entry.pack()
+
+generate_button = tk.Button(root, text="Generate Macro", command=generate_macro)
+generate_button.pack(pady=20)
+
+instruction_label = tk.Label(root, text="Инструкция:\n1. Всегда копируй нужный файл Excel и работай с его копией. Макрос после выполнения делает невозможным возврат.\n2. Вводишь данные.\n3. Открываешь нужный эксель и нажимаешь Alt+F11 появится окошко.\n4. В нём нажимаешь F7, или view -> code появится ещё окно.\n5. Копируешь сюда программный код из файла «макрос».\n6. Сохраняешь.\n7. Переходишь в файл экселя, то можно закрывать окно. Нажимаешь ALT+F8, открывается окно, в нём выбираешь макрос с названием «КрасныеЧисла».\n8. Жмёшь «выполнить» ")
+instruction_label.pack(pady=20)
+
+root.mainloop()

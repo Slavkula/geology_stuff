@@ -1,0 +1,31 @@
+import openpyxl
+from docx import Document
+
+# Открываем файл Excel
+workbook = openpyxl.load_workbook('образец экселя.xlsx')
+sheet = workbook['Лист1']
+
+# Открываем файл Word
+doc = Document('образец текста.docx')
+
+# Создаем новый файл Word
+new_doc = Document()
+
+# Цикл для обработки строк в Excel
+for row in range(1, 110):  # Предполагая, что вам нужно обработать 10 строк
+    # Получаем значения из ячеек
+    value1 = sheet.cell(row, 1).value
+    value2 = sheet.cell(row, 2).value
+    value3 = sheet.cell(row, 3).value
+
+    # Проверяем, что значения не пустые
+    if value1 is not None and value2 is not None and value3 is not None:
+        # Обновляем значения в тексте
+        for paragraph in doc.paragraphs:
+            updated_text = paragraph.text.replace('ЭТО1', str(value1))
+            updated_text = updated_text.replace('ЭТО2', str(value2))
+            updated_text = updated_text.replace('ЭТО3', str(value3))
+            new_doc.add_paragraph(updated_text)
+
+# Сохраняем новый файл Word
+new_doc.save('new_text.docx')

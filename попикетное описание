@@ -1,61 +1,86 @@
-import tkinter as tk
-from tkinter import filedialog
 import openpyxl
 from docx import Document
+import tkinter as tk
+from tkinter import filedialog, Entry, Label, Button
 
-def create_new_file():
-    excel_file_path = excel_file_entry.get()
-    word_file_path = word_file_entry.get()
+def replace_words():
+    # Открываем файл Excel
+    workbook = openpyxl.load_workbook(excel_file.get())
+    sheet = workbook['Лист1']
 
-    workbook = openpyxl.load_workbook(excel_file_path)
-    sheet = workbook.active
-    doc = Document(word_file_path)
+    # Открываем файл Word
+    doc = Document(word_file.get())
+
+    # Создаем новый файл Word
     new_doc = Document()
 
-    for row in range(1, 110):  
+    # Цикл для обработки строк в Excel
+    for row in range(1, 20):  # Предполагая, что вам нужно обработать 10 строк
+        # Получаем значения из ячеек
         value1 = sheet.cell(row, 1).value
         value2 = sheet.cell(row, 2).value
         value3 = sheet.cell(row, 3).value
+        value4 = sheet.cell(row, 4).value
 
+        # Проверяем, что значения не пустые
         if value1 is not None and value2 is not None and value3 is not None:
+            # Обновляем значения в тексте
             for paragraph in doc.paragraphs:
-                updated_text = paragraph.text.replace('ЭТО1', str(value1))
-                updated_text = updated_text.replace('ЭТО2', str(value2))
-                updated_text = updated_text.replace('ЭТО3', str(value3))
+                updated_text = paragraph.text.replace(word1.get(), str(value1))
+                updated_text = updated_text.replace(word2.get(), str(value2))
+                updated_text = updated_text.replace(word3.get(), str(value3))
+                updated_text = updated_text.replace(word4.get(), str(value4))
                 new_doc.add_paragraph(updated_text)
 
-    new_file_path = filedialog.asksaveasfilename(filetypes=[("Word files", "*.docx")])
-    if new_file_path:
-        new_doc.save('готовый файл.docx')
-
-def browse_excel_file():
-    excel_file_path = filedialog.askopenfilename(filetypes=[("Excel files", "*.xlsx")])
-    excel_file_entry.delete(0, tk.END)
-    excel_file_entry.insert(0, excel_file_path)
-
-def browse_word_file():
-    word_file_path = filedialog.askopenfilename(filetypes=[("Word files", "*.docx")])
-    word_file_entry.delete(0, tk.END)
-    word_file_entry.insert(0, word_file_path)
+    # Сохраняем новый файл Word
+    new_doc.save('BOBER KURWA.docx')
 
 root = tk.Tk()
-root.title("File Processor")
 
-excel_file_label = tk.Label(root, text="Выберите файл Excel:")
-excel_file_label.pack()
-excel_file_entry = tk.Entry(root, width=50)
-excel_file_entry.pack()
-excel_file_button = tk.Button(root, text="Обзор", command=browse_excel_file)
-excel_file_button.pack()
+excel_file = tk.StringVar()
+word_file = tk.StringVar()
+word1 = tk.StringVar()
+word2 = tk.StringVar()
+word3 = tk.StringVar()
+word4 = tk.StringVar()
 
-word_file_label = tk.Label(root, text="Выберите файл Word:")
-word_file_label.pack()
-word_file_entry = tk.Entry(root, width=50)
-word_file_entry.pack()
-word_file_button = tk.Button(root, text="Обзор", command=browse_word_file)
-word_file_button.pack()
+Label(root, text="Файл Excel:").grid(row=0, column=0)
+Entry(root, textvariable=excel_file).grid(row=0, column=1)
+Button(root, text="Выбрать файл Excel", command=lambda: excel_file.set(filedialog.askopenfilename())).grid(row=0, column=2)
 
-create_file_button = tk.Button(root, text="Создать файл", command=create_new_file)
-create_file_button.pack()
+Label(root, text="Файл Word:").grid(row=1, column=0)
+Entry(root, textvariable=word_file).grid(row=1, column=1)
+Button(root, text="Выбрать файл Word", command=lambda: word_file.set(filedialog.askopenfilename())).grid(row=1, column=2)
+
+Label(root, text="Слово 1:").grid(row=2, column=0)
+Entry(root, textvariable=word1).grid(row=2, column=1)
+
+Label(root, text="Слово 2:").grid(row=3, column=0)
+Entry(root, textvariable=word2).grid(row=3, column=1)
+
+Label(root, text="Слово 3:").grid(row=4, column=0)
+Entry(root, textvariable=word3).grid(row=4, column=1)
+
+Label(root, text="Слово 4:").grid(row=5, column=0)
+Entry(root, textvariable=word4).grid(row=5, column=1)
+
+Button(root, text="Заменить слова", command=replace_words).grid(row=6, column=1)
+
+instructions = """
+Всегда внимательно подготавливай файлы ворда и экселя.
+Всегда делай копии этих файлов.
+Выбирай такие слова, которых нет в тексте совсем:
+если будет слово "один" и "одинаковый" программа испортит все слова,
+в которых встречается "один".
+1. Выбираешь файл ворда, в котором будут делаться замены.
+2. Выбираешь файл экселя, из которого будут браться данные для замены. 
+3. Записываешь слова, которые надо заменить:
+а) Слова в подготовленном тексте пишешь заранее.
+б) Используются ячейки экселя от А до D
+в) Используются значения от 1 до 20, пустые будут пропущены.
+4. Нажимаешь "заменить слова"
+5. В папке с программой появится файл "BOBER KURWA" в нём готовый текст.
+"""
+Label(root, text=instructions).grid(row=7, column=0, columnspan=3)
 
 root.mainloop()

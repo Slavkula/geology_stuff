@@ -17,19 +17,16 @@ def replace_words():
     # Цикл для обработки строк в Excel
     for row in range(1, 200):  #  обработать 200 строк
         # Получаем значения из ячеек
-        value1 = sheet.cell(row, 1).value
-        value2 = sheet.cell(row, 2).value
-        value3 = sheet.cell(row, 3).value
-        value4 = sheet.cell(row, 4).value
+        values = [sheet.cell(row, i).value for i in range(1, 9)]
 
         # Проверяем, что значения не пустые
-        if value1 is not None and value2 is not None and value3 is not None:
+        if all(value is not None for value in values):
             # Обновляем значения в тексте
             for paragraph in doc.paragraphs:
-                updated_text = paragraph.text.replace(word1.get(), str(value1))
-                updated_text = updated_text.replace(word2.get(), str(value2))
-                updated_text = updated_text.replace(word3.get(), str(value3))
-                updated_text = updated_text.replace(word4.get(), str(value4))
+                updated_text = paragraph.text
+                for word, value in zip(words, values):
+                    if word.get():
+                        updated_text = updated_text.replace(word.get(), str(value))
                 new_doc.add_paragraph(updated_text)
 
     # Сохраняем новый файл Word
@@ -57,10 +54,7 @@ root = tk.Tk()
 
 excel_file = tk.StringVar()
 word_file = tk.StringVar()
-word1 = tk.StringVar()
-word2 = tk.StringVar()
-word3 = tk.StringVar()
-word4 = tk.StringVar()
+words = [tk.StringVar() for _ in range(8)]
 
 Label(root, text="Файл Excel:").grid(row=0, column=0)
 Entry(root, textvariable=excel_file).grid(row=0, column=1)
@@ -70,20 +64,12 @@ Label(root, text="Файл Word:").grid(row=1, column=0)
 Entry(root, textvariable=word_file).grid(row=1, column=1)
 Button(root, text="Выбрать файл Word", command=lambda: word_file.set(filedialog.askopenfilename())).grid(row=1, column=2)
 
-Label(root, text="Слово 1:").grid(row=2, column=0)
-Entry(root, textvariable=word1).grid(row=2, column=1)
+for i in range(8):
+    Label(root, text=f"Слово {i+1}:").grid(row=i+2, column=0)
+    Entry(root, textvariable=words[i]).grid(row=i+2, column=1)
 
-Label(root, text="Слово 2:").grid(row=3, column=0)
-Entry(root, textvariable=word2).grid(row=3, column=1)
-
-Label(root, text="Слово 3:").grid(row=4, column=0)
-Entry(root, textvariable=word3).grid(row=4, column=1)
-
-Label(root, text="Слово 4:").grid(row=5, column=0)
-Entry(root, textvariable=word4).grid(row=5, column=1)
-
-Button(root, text="Заменить слова", command=replace_words).grid(row=6, column=1)
-Button(root, text="Показать макрос", command=show_macro).grid(row=6, column=2)
+Button(root, text="Заменить слова", command=replace_words).grid(row=10, column=1)
+Button(root, text="Показать макрос", command=show_macro).grid(row=10, column=2)
 
 instructions = """
 Всегда внимательно подготавливай файлы ворда и экселя.
@@ -91,7 +77,7 @@ instructions = """
 Выбирай такие слова, которых нет в тексте совсем:
 если будет слово "один" и "одинаковый" программа испортит все слова,
 в которых встречается "один".
-1. Выбираешь файл ворда, в котором будут делаться замены.
+1. Выбирай файл ворда, в котором будут делаться замены.
 2. Выбираешь файл экселя, из которого будут браться данные для замены. 
 3. Записываешь слова, которые надо заменить:
 а) Слова в подготовленном тексте пишешь заранее.
@@ -99,7 +85,8 @@ instructions = """
 в) Используются значения от 1 до 200, пустые будут пропущены.
 4. Нажимаешь "заменить слова"
 5. В папке с программой появится файл "BOBER KURWA" в нём готовый текст.
+Кнопка макроса покажет макрос для экселя, который сделает ячейки в одну строку.
 """
-Label(root, text=instructions).grid(row=7, column=0, columnspan=3)
+Label(root, text=instructions).grid(row=11, column=0, columnspan=3)
 
 root.mainloop()

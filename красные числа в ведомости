@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import ttk
 from docx import Document
 
 def generate_macro():
@@ -25,9 +26,8 @@ def generate_macro():
     Next i
 End Sub'''
 
-    document = Document()
-    document.add_paragraph(macro_code)
-    document.save('макрос.docx')
+    macro_text.delete(1.0, tk.END)  # Очищаем текстовый виджет
+    macro_text.insert(tk.END, macro_code)  # Вставляем новый макрос в текстовый виджет
 
 root = tk.Tk()
 root.title("Macro Generator")
@@ -60,7 +60,13 @@ hundred_column_entry.pack()
 generate_button = tk.Button(root, text="Generate Macro", command=generate_macro)
 generate_button.pack(pady=20)
 
-instruction_label = tk.Label(root, text="Инструкция:\n1. Всегда копируй нужный файл Excel и работай с его копией. Макрос после выполнения делает невозможным возврат.\n2. Вводишь данные.\n3. Открываешь нужный эксель и нажимаешь Alt+F11 появится окошко.\n4. В нём нажимаешь F7, или view -> code появится ещё окно.\n5. Копируешь сюда программный код из файла «макрос».\n6. Сохраняешь.\n7. Переходишь в файл экселя, то можно закрывать окно. Нажимаешь ALT+F8, открывается окно, в нём выбираешь макрос с названием «КрасныеЧисла».\n8. Жмёшь «выполнить» ")
+macro_text_label = tk.Label(root, text="Сгенерированный макрос:")
+macro_text_label.pack()
+
+macro_text = tk.Text(root, height=10, width=50)
+macro_text.pack()
+
+instruction_label = tk.Label(root, text="Инструкция:\n1. Всегда копируй нужный файл Excel и работай с его копией. Макрос после выполнения делает невозможным возврат.\n2. Вводишь данные.\n3. Открываешь нужный эксель и нажимаешь Alt+F11 появится окошко.\n4. В нём нажимаешь F7, или view -> code появится ещё окно.\n5. Копируешь сюда программный код.\n6. Сохраняешь.\n7. Переходишь в файл экселя, то можно закрывать окно. Нажимаешь ALT+F8, открывается окно, в нём выбираешь макрос с названием «КрасныеЧисла».\n8. Жмёшь «выполнить» ")
 instruction_label.pack(pady=20)
 
 root.mainloop()

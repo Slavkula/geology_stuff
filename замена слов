@@ -1,7 +1,7 @@
 import openpyxl
 from docx import Document
 import tkinter as tk
-from tkinter import filedialog, Entry, Label, Button
+from tkinter import filedialog, Entry, Label, Button, Toplevel, Text, END
 
 def replace_words():
     # Открываем файл Excel
@@ -35,6 +35,24 @@ def replace_words():
     # Сохраняем новый файл Word
     new_doc.save('BOBER KURWA.docx')
 
+def show_macro():
+    macro_text = """
+Sub OdnaStroka()
+    Dim cell As Range
+    For Each cell In Range("C1:C" & Cells(Rows.Count, "C").End(xlUp).Row) 
+        If InStr(cell.Value, Chr(10)) > 0 Then 
+            cell.Value = Replace(cell.Value, Chr(10), " ") 
+        End If
+    Next cell
+End Sub
+"""
+    popup = Toplevel(root)
+    popup.title("Макрос")
+    popup.geometry("400x300")
+    macro_display = Text(popup)
+    macro_display.insert(END, macro_text)
+    macro_display.pack()
+
 root = tk.Tk()
 
 excel_file = tk.StringVar()
@@ -65,6 +83,7 @@ Label(root, text="Слово 4:").grid(row=5, column=0)
 Entry(root, textvariable=word4).grid(row=5, column=1)
 
 Button(root, text="Заменить слова", command=replace_words).grid(row=6, column=1)
+Button(root, text="Показать макрос", command=show_macro).grid(row=6, column=2)
 
 instructions = """
 Всегда внимательно подготавливай файлы ворда и экселя.
@@ -77,7 +96,7 @@ instructions = """
 3. Записываешь слова, которые надо заменить:
 а) Слова в подготовленном тексте пишешь заранее.
 б) Используются ячейки экселя от А до D
-в) Используются значения от 1 до 20, пустые будут пропущены.
+в) Используются значения от 1 до 200, пустые будут пропущены.
 4. Нажимаешь "заменить слова"
 5. В папке с программой появится файл "BOBER KURWA" в нём готовый текст.
 """

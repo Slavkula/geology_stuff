@@ -1,0 +1,8 @@
+Sub OdnaStroka()
+    Dim cell As Range
+    For Each cell In Range("C1:C" & Cells(Rows.Count, "C").End(xlUp).Row) 
+        If InStr(cell.Value, Chr(10)) > 0 Then 
+            cell.Value = Replace(cell.Value, Chr(10), " ") 
+        End If
+    Next cell
+End Sub

@@ -6,7 +6,6 @@ folder_path = 'C:/Users/1/Desktop/описание 2 часть/'
 
 # Создаем новый файл Excel для объединения данных
 combined_wb = openpyxl.Workbook()
-combined_wb.remove(combined_wb.active)  # Удаляем первый лист по умолчанию
 
 # Читаем каждый файл и добавляем его данные в общий файл Excel
 for file in os.listdir(folder_path):
@@ -16,9 +15,10 @@ for file in os.listdir(folder_path):
 
         for sheet_name in wb.sheetnames:
             sheet = wb[sheet_name]  # Выбираем лист
-            combined_sheet = combined_wb.create_sheet(title=sheet_name)  # Создаем лист в общем файле
+            combined_sheet = combined_wb.create_sheet(title=file.split('.xlsx')[0])  # Создаем лист в общем файле с именем файла
             for row in sheet.iter_rows(values_only=True):
                 combined_sheet.append(row)  # Копируем данные из листа в общий файл
 
-# Сохраняем общий файл Excel
 combined_wb.save('объединенный_файл.xlsx')
+
+# листы в файле будут называться как называются исходные файлы

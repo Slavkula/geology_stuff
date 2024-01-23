@@ -1,0 +1,24 @@
+import openpyxl
+import os
+
+# Путь к папке с файлами Excel
+folder_path = 'C:/Users/1/Desktop/описание 2 часть/'
+
+# Создаем новый файл Excel для объединения данных
+combined_wb = openpyxl.Workbook()
+combined_wb.remove(combined_wb.active)  # Удаляем первый лист по умолчанию
+
+# Читаем каждый файл и добавляем его данные в общий файл Excel
+for file in os.listdir(folder_path):
+    if file.endswith('.xlsx'):
+        file_path = os.path.join(folder_path, file)  # Полный путь к файлу
+        wb = openpyxl.load_workbook(file_path)  # Загружаем книгу Excel
+
+        for sheet_name in wb.sheetnames:
+            sheet = wb[sheet_name]  # Выбираем лист
+            combined_sheet = combined_wb.create_sheet(title=sheet_name)  # Создаем лист в общем файле
+            for row in sheet.iter_rows(values_only=True):
+                combined_sheet.append(row)  # Копируем данные из листа в общий файл
+
+# Сохраняем общий файл Excel
+combined_wb.save('объединенный_файл.xlsx')

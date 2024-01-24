@@ -1,0 +1,91 @@
+import tkinter as tk
+from tkinter import ttk
+import pandas as pd
+import os
+from tkinter import filedialog, messagebox
+
+# Ваша программа
+def select_excel_file():
+    file_path = filedialog.askopenfilename()
+    if file_path:
+        excel_file_label.config(text=file_path)
+
+def select_output_folder():
+    folder_path = filedialog.askdirectory()
+    if folder_path:
+        output_folder_label.config(text=folder_path)
+
+def convert_to_csv():
+    global csv_files_list
+    file_path = excel_file_label.cget("text")
+    save_directory = output_folder_label.cget("text")
+
+    try:
+        df = pd.read_excel(file_path, sheet_name='Лист1')  # Изменяй на имя эксель листа
+        for i in range(df.shape[1]):
+            new_df = df.iloc[:, [0, i]]
+            file_name = df.columns[i]
+            csv_file_path = os.path.join(save_directory, f"{file_name}.csv")
+            new_df.to_csv(csv_file_path, sep=';', index=False, encoding='utf-8-sig')
+            csv_files_list.append(csv_file_path)  # Добавляем путь к каждому созданному файлу CSV
+    except Exception as e:
+        messagebox.showerror("Ошибка", str(e))
+
+def delete_first_line():
+    for file_path in csv_files_list:
+        with open(file_path, 'r', encoding='utf-8') as file:
+            lines = file.readlines()
+        with open(file_path, 'w', encoding='utf-8') as file:
+            file.writelines(lines[1:])  # Записываем все строки, кроме первой
+
+# Создание экземпляра Tkinter
+window = tk.Tk()
+window.title("Сборник")
+
+# Создание вкладок
+tab_control = ttk.Notebook(window)
+
+# Вкладка 1
+tab1 = ttk.Frame(tab_control)
+tab_control.add(tab1, text='Excel -> .csv')
+
+global csv_files_list  # Глобальный список для хранения путей к файлам CSV
+csv_files_list = []
+
+excel_file_label = tk.Label(tab1, text="Выберите файл Excel:")
+excel_file_label.pack()
+excel_file_button = tk.Button(tab1, text="Выбрать файл", command=select_excel_file)
+excel_file_button.pack()
+
+output_folder_label = tk.Label(tab1, text="Выберите папку для сохранения файлов CSV:")
+output_folder_label.pack()
+output_folder_button = tk.Button(tab1, text="Выбрать папку", command=select_output_folder)
+output_folder_button.pack()
+
+convert_button = tk.Button(tab1, text="Преобразовать в CSV", command=convert_to_csv)
+convert_button.pack()
+
+delete_first_line_button = tk.Button(tab1, text="Удалить первую строку в файлах CSV", command=delete_first_line)
+delete_first_line_button.pack()
+
+text = """
+Программа будет создавать .csv файлы
+0. Данные эксель файла должны быть на листе с названием "Лист1"
+1. Выбираешь эксель файл из которого берёшь данные
+2. Выбираешь папку куда сохранить .csv
+3. Жмёшь "Преобразовать".
+4. Жмёшь "Убрать первую строку"
+Готово
+"""
+text_label = tk.Label(tab1, text=text)
+text_label.pack()
+
+# Остальные вкладки
+for i in range(2, 6):
+    tab = ttk.Frame(tab_control)
+    tab_control.add(tab, text=f'Программа {i}')
+    ttk.Label(tab, text=f'Программа {i}', font=("Arial Bold", 20)).grid(column=0, row=0)
+
+tab_control.pack(expand=1, fill='both')
+
+window.mainloop()

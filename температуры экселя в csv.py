@@ -3,7 +3,7 @@ import os
 import tkinter as tk
 from tkinter import filedialog, messagebox
 
-def select_excel_file():
+def select_excel_file():  #от
     file_path = filedialog.askopenfilename()
     if file_path:
         excel_file_label.config(text=file_path)
@@ -66,6 +66,6 @@ AA, AB, AC так далее до конца файла.
 3.  Удаляешь кнопкой первые строки. Если файлов много, то может занять какое-то время.
 """
 text_label = tk.Label(root, text=text)
-text_label.pack()
+text_label.pack() #до
 
 root.mainloop()

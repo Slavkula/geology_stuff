@@ -1,10 +1,21 @@
 import tkinter as tk
 from tkinter import ttk
+from tkinter import filedialog
+from tkinter import messagebox
 import pandas as pd
 import os
-from tkinter import filedialog, messagebox
 
-# Ваша программа
+# Создание экземпляра Tkinter
+window = tk.Tk()
+window.title("Пример GUI")
+
+# Создание вкладок
+tab_control = ttk.Notebook(window)
+
+# Добавление кода в первую вкладку
+tab1 = ttk.Frame(tab_control)
+tab_control.add(tab1, text='Программа 1')
+
 def select_excel_file():
     file_path = filedialog.askopenfilename()
     if file_path:
@@ -21,7 +32,7 @@ def convert_to_csv():
     save_directory = output_folder_label.cget("text")
 
     try:
-        df = pd.read_excel(file_path, sheet_name='Лист1')  # Изменяй на имя эксель листа
+        df = pd.read_excel(file_path, sheet_name='Лист3')  # Изменяй на имя эксель листа
         for i in range(df.shape[1]):
             new_df = df.iloc[:, [0, i]]
             file_name = df.columns[i]
@@ -37,17 +48,6 @@ def delete_first_line():
             lines = file.readlines()
         with open(file_path, 'w', encoding='utf-8') as file:
             file.writelines(lines[1:])  # Записываем все строки, кроме первой
-
-# Создание экземпляра Tkinter
-window = tk.Tk()
-window.title("Сборник")
-
-# Создание вкладок
-tab_control = ttk.Notebook(window)
-
-# Вкладка 1
-tab1 = ttk.Frame(tab_control)
-tab_control.add(tab1, text='Excel -> .csv')
 
 global csv_files_list  # Глобальный список для хранения путей к файлам CSV
 csv_files_list = []
@@ -69,19 +69,85 @@ delete_first_line_button = tk.Button(tab1, text="Удалить первую с�
 delete_first_line_button.pack()
 
 text = """
-Программа будет создавать .csv файлы
-0. Данные эксель файла должны быть на листе с названием "Лист1"
-1. Выбираешь эксель файл из которого берёшь данные
-2. Выбираешь папку куда сохранить .csv
-3. Жмёшь "Преобразовать".
-4. Жмёшь "Убрать первую строку"
-Готово 
+Программа копирует столбцы с температурами из экселя. Берутся столбцы:
+AA, AB, AC так далее до конца файла.
+1.  Выбираешь эксель, из которого надо взять данные.
+2.  Выбираешь папку, в которую нужно сохранить твои .csv файлы.
+3.  Удаляешь кнопкой первые строки. Если файлов много, то может занять какое-то время.
 """
 text_label = tk.Label(tab1, text=text)
 text_label.pack()
 
-# Остальные вкладки
-for i in range(2, 6):
+# Добавление кода во вторую вкладку
+tab2 = ttk.Frame(tab_control)
+tab_control.add(tab2, text='Программа 2')
+
+def generate_macro():
+    peremen1 = page_name_entry.get()
+    peremen2 = start_cell_entry.get()
+    peremen3 = end_cell_entry.get()
+    peremen4 = column_entry.get()
+    peremen5 = hundred_column_entry.get()
+
+    macro_code = f'''Sub КрасныеЧисла()
+    Dim ws As Worksheet
+    Dim i As Long
+    Set ws = ThisWorkbook.Sheets("{peremen1}")
+
+    For i = {peremen2} To {peremen3}
+        Dim originalValue As Variant
+        Dim adjustedValue As Double
+
+        originalValue = ws.Cells(i, "{peremen5}").Value
+        If IsNumeric(originalValue) Then
+            adjustedValue = 100 - originalValue
+            ws.Cells(i, "{peremen4}").Value = ws.Cells(i, "{peremen4}").Value + adjustedValue
+        End If
+    Next i
+End Sub'''
+
+    macro_text.delete(1.0, tk.END)  # Очищаем текстовый виджет
+    macro_text.insert(tk.END, macro_code)  # Вставляем новый макрос в текстовый виджет
+
+page_name_label = tk.Label(tab2, text="Имя листа:")
+page_name_label.pack()
+page_name_entry = tk.Entry(tab2)
+page_name_entry.pack()
+
+start_cell_label = tk.Label(tab2, text="Первая ячейка:")
+start_cell_label.pack()
+start_cell_entry = tk.Entry(tab2)
+start_cell_entry.pack()
+
+end_cell_label = tk.Label(tab2, text="Последняя:")
+end_cell_label.pack()
+end_cell_entry = tk.Entry(tab2)
+end_cell_entry.pack()
+
+column_label = tk.Label(tab2, text="Столбец для замены:")
+column_label.pack()
+column_entry = tk.Entry(tab2)
+column_entry.pack()
+
+hundred_column_label = tk.Label(tab2, text="Столбец, в котором красные числа:")
+hundred_column_label.pack()
+hundred_column_entry = tk.Entry(tab2)
+hundred_column_entry.pack()
+
+generate_button = tk.Button(tab2, text="Generate Macro", command=generate_macro)
+generate_button.pack(pady=20)
+
+macro_text_label = tk.Label(tab2, text="Сгенерированный макрос:")
+macro_text_label.pack()
+
+macro_text = tk.Text(tab2, height=10, width=50)
+macro_text.pack()
+
+instruction_label = tk.Label(tab2, text="Инструкция:\n1. Всегда копируй нужный файл Excel и работай с его копией. Макрос после выполнения делает невозможным возврат.\n2. Вводишь данные.\n3. Открываешь нужный эксель и нажимаешь Alt+F11 появится окошко.\n4. В нём нажимаешь F7, или view -> code появится ещё окно.\n5. Копируешь сюда программный код.\n6. Сохраняешь.\n7. Переходишь в файл экселя, то можно закрывать окно. Нажимаешь ALT+F8, открывается окно, в нём выбираешь макрос с названием «КрасныеЧисла».\n8. Жмёшь «выполнить» ")
+instruction_label.pack(pady=20)
+
+# Создание остальных вкладок
+for i in range(3, 10):
     tab = ttk.Frame(tab_control)
     tab_control.add(tab, text=f'Программа {i}')
     ttk.Label(tab, text=f'Программа {i}', font=("Arial Bold", 20)).grid(column=0, row=0)

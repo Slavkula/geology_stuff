@@ -2,6 +2,7 @@ import openpyxl
 import tkinter as tk
 from tkinter import filedialog
 from tkinter import font
+import os
 
 def process_excel_data(file_path, template_file, start_row, end_row, cells, output_cells, filename_cells):
     wb2 = openpyxl.load_workbook(file_path)
@@ -131,13 +132,54 @@ instructions = tk.Label(window, text="""
 1. Строки: это с какой брать данные и до какой
 Если тебе нужна только одна, то указываешь число два раза.
 2. Столбцы это из каких брать (Например А).
-3. Ячейки для карточки и пишутся как ячейка (например А1)
+3. Ячейки это в какие копировать (например А1)
 Первая ячейка всегда записывается со словом 'Скважина №'
 Если она не нужна, то начинаешь со вторых.
 4. Столбцы для создания имени файла (Только буква).
-Имя файла будет 'Первая-вторая'
-Берутся из ведомости.
+Имя файла будет 'Первая-вторая', берутся из ведомости.
+5. Объединить нужные файлы в одну книгу можно кнопками ниже.
 """)
 instructions.pack()
 
+
+def select_files():
+    global file_paths
+    file_paths = filedialog.askopenfilenames(filetypes=[("Excel files", "*.xlsx")])
+    files_label.config(text="Выбрано " + str(len(file_paths)) + " файлов")
+
+def merge_files():
+    if file_paths:
+        combined_wb = openpyxl.Workbook()
+        for file_path in file_paths:
+            wb = openpyxl.load_workbook(file_path, data_only=True)
+            for sheet_name in wb.sheetnames:
+                sheet = wb[sheet_name]
+                combined_sheet = combined_wb.create_sheet(title=os.path.basename(file_path).split('.xlsx')[0])
+                for row in sheet.iter_rows(values_only=True):
+                    combined_sheet.append(row)
+
+        first_sheet = combined_wb.sheetnames[0]
+        if first_sheet == "Sheet":
+            del combined_wb[first_sheet]
+
+        save_path = filedialog.asksaveasfilename(defaultextension=".xlsx", filetypes=[("Excel files", "*.xlsx")])
+        if save_path:
+            combined_wb.save(save_path)
+
+# Создаем контейнер для кнопок
+button_frame = tk.Frame(window)
+button_frame.pack(pady=10)
+
+# Создаем виджеты в контейнере
+select_files_button = tk.Button(button_frame, text="Выбрать файлы", command=select_files)
+select_files_button.pack(side="left", padx=5)
+
+merge_button = tk.Button(button_frame, text="Объединить файлы", command=merge_files)
+merge_button.pack(side="left", padx=5)
+
+# Создаем виджет для отображения количества выбранных файлов
+files_label = tk.Label(window, text="Выбрано 0 файлов")
+files_label.pack()
+
+# Запускаем главный цикл обработки событий
 window.mainloop()

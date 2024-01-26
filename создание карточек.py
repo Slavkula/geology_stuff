@@ -57,7 +57,7 @@ default_font.configure(size=20)
 frame1 = tk.Frame(window)
 frame1.pack(pady=10)
 
-label_data_file = tk.Label(frame1, text="Файл данных:")
+label_data_file = tk.Label(frame1, text="Файл ведомости:")
 label_data_file.pack(side=tk.LEFT)
 data_file_button = tk.Button(frame1, text="Выбрать файл", command=on_data_file_button_click)
 data_file_button.pack(side=tk.LEFT, padx=10)
@@ -86,7 +86,7 @@ frame3.pack(pady=10)
 entries = []
 for i in range(10):
     if i == 0:
-        label = tk.Label(frame3, text=f"Ячейка {i+1}:")
+        label = tk.Label(frame3, text=f"Столбец {i+1}:")
     else:
         label = tk.Label(frame3, text=f"{i+1}:")
     label.pack(side=tk.LEFT)
@@ -126,7 +126,18 @@ label_result = tk.Label(window, text="")
 label_result.pack()
 
 # Add instructions to the bottom of the window
-instructions = tk.Label(window, text="Пояснения:\n1. Строки: указываешь с которой начинать брать данные и до.\n2. Верхние ячейки для ведомости и пишутся буквы (Например А).\n3 Нижние для карточки и пишутся как ячейка (например А1).\n4. Ячейки для создания имени файла (Только буква).")
+instructions = tk.Label(window, text="""
+Инструкция:
+1. Строки: это с какой брать данные и до какой
+Если тебе нужна только одна, то указываешь число два раза.
+2. Столбцы это из каких брать (Например А).
+3. Ячейки для карточки и пишутся как ячейка (например А1)
+Первая ячейка всегда записывается со словом 'Скважина №'
+Если она не нужна, то начинаешь со вторых.
+4. Столбцы для создания имени файла (Только буква).
+Имя файла будет 'Первая-вторая'
+Берутся из ведомости.
+""")
 instructions.pack()
 
 window.mainloop()

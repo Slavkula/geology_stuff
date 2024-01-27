@@ -29,9 +29,9 @@ open_card_button = tk.Button(window, text="Убрать красные числ�
 open_card_button.pack()
 
 def open_card_script():
-    subprocess.call(['python', 'карточки3.py'])
+    subprocess.call(['python', 'Заполнение ведомости.py'])
 
-open_card_button = tk.Button(window, text="Создание карточек3", command=open_card_script, font=('Arial', 20), width=30)
+open_card_button = tk.Button(window, text="Заполнение ведомости", command=open_card_script, font=('Arial', 20), width=30)
 open_card_button.pack()
 
 def open_card_script():

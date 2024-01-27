@@ -23,9 +23,9 @@ open_card_button = tk.Button(window, text="Сделать .csv из экселя
 open_card_button.pack()
 
 def open_card_script():
-    subprocess.call(['python', 'вкладки2.py'])
+    subprocess.call(['python', 'красные числа.py'])
 
-open_card_button = tk.Button(window, text="Создание вкладок2", command=open_card_script, font=('Arial', 20), width=30)
+open_card_button = tk.Button(window, text="Убрать красные числа", command=open_card_script, font=('Arial', 20), width=30)
 open_card_button.pack()
 
 def open_card_script():

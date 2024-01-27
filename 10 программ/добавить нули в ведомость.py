@@ -78,22 +78,13 @@ run_button.pack()
 result_label = tk.Label(root, text="", font=('Arial', 22))
 result_label.pack()
 
-# Инструкция
-instruction_label = tk.Label(root, text="Инструкция:", font=('Arial', 22))
-instruction_label.pack()
+text = """
+1. Копируешь оригинальный файл и работаешь в нём.
+2. Выбираешь файл, столбцы и строки куда добавить нули.
+3. Нажимаешь 'Выполнить'. Может занять время.
+4. Повторяешь для следующего блока.
+"""
+text_label = tk.Label(root, text=text, font=("Arial", 20))
+text_label.pack()
 
-step1_label = tk.Label(root, text="1. Копируешь оригинальный файл и работаешь в нём.", font=('Arial', 22))
-step1_label.pack()
-
-step2_label = tk.Label(root, text="2. Выбираешь файл, столбцы и строки.", font=('Arial', 22))
-step2_label.pack()
-
-step3_label = tk.Label(root, text="3. Нажимаешь 'Выполнить'. Может занять время.", font=('Arial', 22))
-step3_label.pack()
-
-step4_label = tk.Label(root, text="4. Повторяешь для всех строк и столбцов какие нужны.", font=('Arial', 22))
-step4_label.pack()
-
-
-# Запускаем главный цикл обработки событий
 root.mainloop()

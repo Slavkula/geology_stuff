@@ -35,9 +35,9 @@ open_card_button = tk.Button(window, text="Заполнение ведомост
 open_card_button.pack()
 
 def open_card_script():
-    subprocess.call(['python', 'вкладки3.py'])
+    subprocess.call(['python', 'Влажность.py'])
 
-open_card_button = tk.Button(window, text="Создание вкладок3", command=open_card_script, font=('Arial', 20), width=30)
+open_card_button = tk.Button(window, text="Влажность для ведомостей", command=open_card_script, font=('Arial', 20), width=30)
 open_card_button.pack()
 
 def open_card_script():

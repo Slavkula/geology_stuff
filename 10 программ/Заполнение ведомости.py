@@ -26,21 +26,22 @@ def run_macro():
         ws = wb.ActiveSheet
 
         macro_code = f"""
-        Sub Kikimora()
-            Dim i As Integer
-            Dim cellValue As String
-            Range("{g_value}:{s_value}").Select 
-            Selection.Copy
-            Sheets("Ведь_общая").Select
-            For i = 1 To 20000
-                cellValue = Sheets("Ведь_общая").Range("{m_value}" & i).Value 
-                If cellValue = "{values[0]}" Or cellValue = "{values[1]}" Or cellValue = "{values[2]}" Or cellValue = "{values[3]}" Then 
-                    Range("{bg_value}" & i).Select 
-                    Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
-                        :=False, Transpose:=False
-                End If
-            Next i
-        End Sub
+Sub Kikimora()
+    Dim i As Integer
+    Sheets("Лист1").Select
+    Dim cellValue As String
+    Range("{g_value}:{s_value}").Select
+    Selection.Copy
+    Sheets(1).Select
+    For i = 1 To 20000
+        cellValue = Sheets(1).Range("{m_value}" & i).Value ' Использование индекса первой вкладки
+        If cellValue = "{values[0]}" Or cellValue = "{values[1]}" Or cellValue = "{values[2]}" Or cellValue = "{values[3]}" Then
+            Range("{bg_value}" & i).Select
+            Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+                :=False, Transpose:=False
+        End If
+    Next i
+End Sub
         """
 
         xlmodule = wb.VBProject.VBComponents.Add(1)

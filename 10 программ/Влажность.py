@@ -1,101 +1,86 @@
-import tkinter as tk
-from tkinter import filedialog
 import win32com.client
+from tkinter import filedialog, Tk, Label, Entry, Button, StringVar
 
-def main():
-    root = tk.Tk()
-    root.title("Создаём влажность")
+def select_file():
+    file_path.set(filedialog.askopenfilename())
+    if file_path.get() != "":
+        select_file_button.config(bg="green")
 
-    file_button = tk.Button(root, text="Обзор", command=lambda: select_file(), height=2, width=20, font=("Helvetica", 16))
-    file_button.grid(row=0, column=1)
+def run_macro():
+    Excel = win32com.client.Dispatch("Excel.Application")
+    Excel.Visible = True 
+    wb = Excel.Workbooks.Open(file_path.get())
 
-    tk.Label(root, text="Выбери эксель файл", font=("Helvetica", 16)).grid(row=0, column=0)
+    macro_vba_code = f"""
+    Sub vlazhnost()
+        Dim cellValue As String
+        Sheets("Лист1").Select
+        Range("{range_value.get()}").Select
+        Selection.Copy
+        Sheets(1).Select
+        For i = 1 To 10000
+            cellValue = Range("{column_value.get()}" & i).Value
+            If (cellValue = "{value1.get()}" Or cellValue = "{value2.get()}" Or cellValue = "{value3.get()}" Or cellValue = "{value4.get()}") And cellValue <> "" Then
+                Range("T" & i).Select
+                Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks:=False, Transpose:=False
+                Do While Range("{column_while.get()}" & i).Value < {lower_bound.get()} Or Range("{column_while.get()}" & i).Value > {upper_bound.get()}
+                    Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks:=False, Transpose:=False
+                Loop
+            End If
+        Next i
+    End Sub
+    """
 
-    list2_entry = tk.Entry(root, font=("Helvetica", 16), width=12)
-    list2_entry.grid(row=1, column=1)
+    ExcelModule = wb.VBProject.VBComponents.Add(1)
+    ExcelModule.CodeModule.AddFromString(macro_vba_code)
 
-    tk.Label(root, text="Имя листа для вставки:", font=("Helvetica", 16)).grid(row=1, column=0)
+    Excel.Application.Run('vlazhnost')
 
-    values_entry = [tk.Entry(root, font=("Helvetica", 16), width=12) for _ in range(4)]
-    for i, entry in enumerate(values_entry):
-        entry.grid(row=2+i, column=1)
-        tk.Label(root, text=f"Наименование ИГЭ: {i+1}", font=("Helvetica", 16)).grid(row=2+i, column=0)
 
-    t_entry = tk.Entry(root, font=("Helvetica", 16), width=12)
-    t_entry.grid(row=6, column=1)
+root = Tk()
+root.title("Создаём влажность")
 
-    tk.Label(root, text="Столбец для сверки ИГЭ:", font=("Helvetica", 16)).grid(row=6, column=0)
+file_path = StringVar()
+range_value = StringVar()
+column_value = StringVar()
+value1 = StringVar()
+value2 = StringVar()
+value3 = StringVar()
+value4 = StringVar()
+column_while = StringVar()
+lower_bound = StringVar()
+upper_bound = StringVar()
 
-    y_entry = tk.Entry(root, font=("Helvetica", 16), width=12)
-    y_entry.grid(row=7, column=1)
+select_file_button = Button(root, text="Выбрать файл", command=select_file, bg="red", font=("Helvetica", 16))
+select_file_button.grid(row=0, column=1)
 
-    tk.Label(root, text="Столбец для сверки влажности:", font=("Helvetica", 16)).grid(row=7, column=0)
+Label(root, text="Диапазон копирования", font=("Helvetica", 16)).grid(row=1)
+Entry(root, textvariable=range_value, font=("Helvetica", 16), width=12).grid(row=1, column=1)
 
-    range_entry = tk.Entry(root, font=("Helvetica", 16), width=12)
-    range_entry.grid(row=8, column=1)
+Label(root, text="Для проверки ИГЭ", font=("Helvetica", 16)).grid(row=2)
+Entry(root, textvariable=column_value, font=("Helvetica", 16), width=12).grid(row=2, column=1)
 
-    tk.Label(root, text="Диапазон в формате R29:O29:", font=("Helvetica", 16)).grid(row=8, column=0)
+Label(root, text="ИГЭ 1", font=("Helvetica", 16)).grid(row=3)
+Entry(root, textvariable=value1, font=("Helvetica", 16), width=12).grid(row=3, column=1)
 
-    lower_bound_entry = tk.Entry(root, font=("Helvetica", 16), width=12)
-    lower_bound_entry.grid(row=9, column=1)
+Label(root, text="ИГЭ 2", font=("Helvetica", 16)).grid(row=4)
+Entry(root, textvariable=value2, font=("Helvetica", 16), width=12).grid(row=4, column=1)
 
-    tk.Label(root, text="Граница влажности от:", font=("Helvetica", 16)).grid(row=9, column=0)
+Label(root, text="ИГЭ 3", font=("Helvetica", 16)).grid(row=5)
+Entry(root, textvariable=value3, font=("Helvetica", 16), width=12).grid(row=5, column=1)
 
-    upper_bound_entry = tk.Entry(root, font=("Helvetica", 16), width=12)
-    upper_bound_entry.grid(row=10, column=1)
+Label(root, text="ИГЭ 4", font=("Helvetica", 16)).grid(row=6)
+Entry(root, textvariable=value4, font=("Helvetica", 16), width=12).grid(row=6, column=1)
 
-    tk.Label(root, text="Граница влажности до:", font=("Helvetica", 16)).grid(row=10, column=0)
+Label(root, text="Для проверки влажности", font=("Helvetica", 16)).grid(row=7)
+Entry(root, textvariable=column_while, font=("Helvetica", 16), width=12).grid(row=7, column=1)
 
-    run_button = tk.Button(root, text="Запустить", command=lambda: run_macro(), height=2, width=20, font=("Helvetica", 16))
-    run_button.grid(row=11, column=1)
+Label(root, text="Влажность от", font=("Helvetica", 16)).grid(row=8)
+Entry(root, textvariable=lower_bound, font=("Helvetica", 16), width=12).grid(row=8, column=1)
 
-    file_path = None
-    Excel = None
-    Workbook = None
-    Module = None
+Label(root, text="Влажность до", font=("Helvetica", 16)).grid(row=9)
+Entry(root, textvariable=upper_bound, font=("Helvetica", 16), width=12).grid(row=9, column=1)
 
-    def select_file():
-        nonlocal file_path
-        file_path = filedialog.askopenfilename()
-        file_button.config(bg="green")
+Button(root, text="Обработать", command=run_macro, font=("Helvetica", 16)).grid(row=10, column=1)
 
-    def run_macro():
-        nonlocal Excel, Workbook, Module
-        Excel = win32com.client.Dispatch("Excel.Application")
-        Excel.Visible = True
-        Workbook = Excel.Workbooks.Open(file_path)
-        Module = Workbook.VBProject.VBComponents.Add(1)
-
-        list2 = list2_entry.get()
-        values = [entry.get() for entry in values_entry if entry.get()]
-        t = t_entry.get()
-        y = y_entry.get()
-        range_ = range_entry.get()
-        lower_bound = lower_bound_entry.get()
-        upper_bound = upper_bound_entry.get()
-
-        conditions = " Or ".join([f'Sheets("{list2}").Range("M" & i).Value = "{value}"' for value in values])
-
-        macro = f"""
-        Sub Dolbilka()
-            Dim i As Integer
-            For i = 1 To 10000
-                Sheets("Лист1").Select
-                If {conditions} Then
-                    Do
-                        Range("{range_}").Copy
-                        Sheets("{list2}").Range("{t}" & i).PasteSpecial xlPasteValues
-                    Loop While Sheets("{list2}").Range("{y}" & i).Value < {lower_bound} Or Sheets("{list2}").Range("{y}" & i).Value > {upper_bound}
-                End If
-            Next i
-        End Sub
-        """
-
-        Module.CodeModule.AddFromString(macro)
-        Excel.Application.Run("Dolbilka")
-        Workbook.Save()
-
-    root.mainloop()
-
-if __name__ == "__main__":
-    main()
+root.mainloop()

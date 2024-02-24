@@ -118,7 +118,7 @@ file_label.grid(row=7, column=0, sticky="e")
 bg_entry = Entry(input_frame, textvariable=bg_var, font=('Helvetica', 20), width=12)
 bg_entry.grid(row=7, column=1)
 
-file_label = Label(input_frame, text="Количество строк:", font=('Helvetica', 20))
+file_label = Label(input_frame, text="Начать со строки:", font=('Helvetica', 20))
 file_label.grid(row=8, column=0, sticky="e")
 i_entry = Entry(input_frame, textvariable=i_var, font=('Helvetica', 20), width=12)
 i_entry.grid(row=8, column=1)

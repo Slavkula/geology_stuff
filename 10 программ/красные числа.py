@@ -10,12 +10,10 @@ def run_macro():
     a_value = a_var.get()
     if file_path and start_value and end_value and bf_value and a_value:
         xl = win32com.client.Dispatch("Excel.Application")
-        xl.Visible = True  # Раскомментируйте эту строку, если вы хотите видеть процесс выполнения макроса
-
+        xl.Visible = True 
         wb = xl.Workbooks.Open(file_path)
         ws = wb.ActiveSheet
 
-        # Создаем макрос в VBA с использованием введенных значений
         macro_code = f"""
         Sub CustomLoop()
             Dim ws As Worksheet
@@ -40,10 +38,10 @@ def run_macro():
         xlmodule = wb.VBProject.VBComponents.Add(1)
         xlmodule.CodeModule.AddFromString(macro_code)
 
-        # Запускаем созданный макрос
+
         xl.Run("CustomLoop")
 
-        # Сохраняем изменения и закрываем файл
+
         wb.Save()
         #xl.Quit()
 

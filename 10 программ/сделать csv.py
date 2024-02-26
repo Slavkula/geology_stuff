@@ -18,7 +18,7 @@ def select_output_folder():
 def convert_to_csv():
     global csv_files_list
     try:
-        df = pd.read_excel(file_path)  # Берем данные из активного листа
+        df = pd.read_excel(file_path)  
         for i in range(df.shape[1]):
             new_df = df.iloc[:, [0, i]]
             file_name = df.columns[i]

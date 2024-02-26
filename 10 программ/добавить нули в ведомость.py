@@ -14,16 +14,15 @@ def run_macro():
     wb = openpyxl.load_workbook(file_path)
     ws = wb.active
 
-    # Создаем стиль для белого цвета шрифта Arial размером 11
     white_font = Font(color='00FFFFFF', name='Arial', size=11)
 
     for row in range(start_row, end_row + 1):
         cell_value = ws[f'V{row}'].value
         if isinstance(cell_value, (int, float)):
-            for col in range(ord(from_column) - 65, ord(to_column) - 64):  # Преобразуем букву столбца в номер
+            for col in range(ord(from_column) - 65, ord(to_column) - 64):  
                 if ws.cell(row=row, column=col + 1).value is None:
                     ws.cell(row=row, column=col + 1, value=0)
-                    ws.cell(row=row, column=col + 1).font = white_font  # Применяем стиль для белого цвета шрифта Arial размером 11
+                    ws.cell(row=row, column=col + 1).font = white_font  
 
     wb.save(file_path)
     result_label.config(text="Макрос успешно выполнен. Результат сохранен в выбранном файле.")
@@ -33,12 +32,10 @@ def browse_file():
     file_path_entry.delete(0, tk.END)
     file_path_entry.insert(0, file_path)
 
-# Создаем окно
 root = tk.Tk()
 root.title("Добавление белых нулей")
 root.option_add('*Font', 'Arial 22')
 
-# Создаем элементы управления
 file_label = tk.Label(root, text="Выберите файл:")
 file_label.pack()
 

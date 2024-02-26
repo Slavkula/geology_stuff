@@ -150,7 +150,7 @@ def create_tab(tab_control, tab_name):
         Button(tab, text="Обработать", command=run_macro, font=("Helvetica", 16)).grid(row=11, column=1)
 
         pass
-#третья скрипт грансоста
+
     elif tab_name == 'Грансостав':
         import win32com.client
         from tkinter import Label, Entry, Button, StringVar

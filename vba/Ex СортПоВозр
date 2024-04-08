@@ -1,0 +1,22 @@
+Sub SortSheetsAscending()
+    Dim i As Integer
+    Dim j As Integer
+    Dim iSheets As Integer
+    Dim shtname As String
+
+    Application.ScreenUpdating = False
+    iSheets = Sheets.Count
+
+    For i = 1 To iSheets - 1
+        For j = i + 1 To iSheets
+            If Sheets(j).Name < Sheets(i).Name Then
+                shtname = Sheets(j).Name
+                Sheets(j).Move before:=Sheets(i)
+                Sheets(i).Name = shtname
+            End If
+        Next j
+    Next i
+
+    Application.ScreenUpdating = True
+End Sub
+

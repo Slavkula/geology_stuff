@@ -20,3 +20,27 @@ Sub SortSheetsAscending()
     Application.ScreenUpdating = True
 End Sub
 
+Sub SortSheetsTabName() 'макрос сверяет два числа в имени листа и делает сортировку по возрастанию
+    Application.ScreenUpdating = False
+    Dim ShCount As Integer, i As Integer, j As Integer
+    ShCount = Sheets.Count
+    For i = 1 To ShCount - 1
+        For j = i + 1 To ShCount
+            Dim splitName1 As Variant, splitName2 As Variant
+            splitName1 = Split(Sheets(i).Name, " ")
+            splitName2 = Split(Sheets(j).Name, " ")
+            If UBound(splitName1) >= 1 And UBound(splitName2) >= 1 Then
+                If Val(splitName1(0)) = Val(splitName2(0)) Then
+                    If Val(splitName1(1)) > Val(splitName2(1)) Then
+                        Sheets(j).Move before:=Sheets(i)
+                    End If
+                ElseIf Sheets(j).Name < Sheets(i).Name Then
+                    Sheets(j).Move before:=Sheets(i)
+                End If
+            ElseIf Sheets(j).Name < Sheets(i).Name Then
+                Sheets(j).Move before:=Sheets(i)
+            End If
+        Next j
+    Next i
+    Application.ScreenUpdating = True
+End Sub

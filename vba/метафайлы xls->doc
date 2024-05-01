@@ -1,4 +1,4 @@
-Sub ExcelWordMetaPaste()
+Sub ExcelWordMetaPaste() 'метафайлы в кторых много карточек на 1 листе
     Dim WordApp As Object
     On Error Resume Next
     Set WordApp = GetObject(, "Word.Application")
@@ -33,3 +33,46 @@ Sub ExcelWordMetaPaste()
     Set WordDoc = Nothing
     Set WordApp = Nothing
 End Sub
+
+
+Sub ExcelWordMetaPaste()  'метафайлы, в которых надо брать данные с каждой страницы
+    Dim WordApp As Object
+    On Error Resume Next
+    Set WordApp = GetObject(, "Word.Application")
+    On Error GoTo 0
+
+    If WordApp Is Nothing Then
+        Set WordApp = CreateObject("Word.Application")
+    End If
+
+    If WordApp.Documents.Count = 0 Then
+        MsgBox "Нет открытых документов в Word", vbExclamation
+        Exit Sub
+    End If
+
+    Dim WordDoc As Object
+    Set WordDoc = WordApp.ActiveDocument
+
+    Dim Ranges As Variant
+    Ranges = Array("A1:L38")
+    Dim rng As Variant
+
+    ' Добавляем цикл для перебора всех листов в книге
+    Dim ws As Worksheet
+    For Each ws In ThisWorkbook.Worksheets
+        ws.Activate ' Переключаемся на текущий лист
+
+        For Each rng In Ranges
+            Range(rng).Copy
+            WordApp.Selection.PasteSpecial Link:=False, DataType:=wdPasteEnhancedMetafile, Placement:=wdInLine, DisplayAsIcon:=False
+            WordApp.Selection.TypeParagraph
+            WordApp.Selection.TypeParagraph
+        Next rng
+
+        Application.CutCopyMode = False
+    Next ws
+
+    Set WordDoc = Nothing
+    Set WordApp = Nothing
+End Sub
+

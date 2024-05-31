@@ -1,3 +1,6 @@
+первая часть для нескольких, нижняя часть для одиночных
+
+
 Sub ExcelWordMetaPaste() 'метафайлы в кторых много карточек на 1 листе
     Dim WordApp As Object
     On Error Resume Next

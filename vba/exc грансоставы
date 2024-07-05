@@ -1,0 +1,48 @@
+Sub ОбъединенныйМакрос()
+    Dim ws43b As Worksheet
+    Dim ws43be As Worksheet
+    Dim ws43vo As Worksheet
+    Dim wsЛист1 As Worksheet
+    Dim rngSource1 As Range
+    Dim rngSource2 As Range
+    Dim rngSource3 As Range
+    Dim rngTarget1 As Range
+    Dim rngTarget2 As Range
+    Dim rngTarget3 As Range
+    Dim cell As Range
+    
+    ' Указываем листы
+    Set ws43b = ThisWorkbook.Sheets("43б")
+    Set ws43be = ThisWorkbook.Sheets("43бэ")
+    Set ws43vo = ThisWorkbook.Sheets("43во")
+    Set wsЛист1 = ThisWorkbook.Sheets("Лист1")
+    
+    ' Копируем диапазоны из листов 43б и 43бэ
+    Set rngSource1 = ws43b.Range("K250:S250")
+    Set rngSource2 = ws43be.Range("G250:S250")
+    Set rngSource3 = ws43be.Range("H250:S250")
+    
+    ' Переходим на лист "Лист1"
+    wsЛист1.Activate
+    
+    ' Проверяем столбец M на наличие значений "43б" и "43бэ"
+    For Each cell In wsЛист1.Range("M:M")
+        If cell.Value = "43б" Or cell.Value = "43в" Then
+            ' Вставляем скопированные значения в столбец BJ (специальная вставка значений)
+            Set rngTarget1 = wsЛист1.Range("BJ" & cell.Row)
+            rngSource1.Copy
+            rngTarget1.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks:=False, Transpose:=False
+        ElseIf cell.Value = "43бэ" Then
+            ' Вставляем скопированные значения в столбец BF (специальная вставка значений)
+            Set rngTarget2 = wsЛист1.Range("BF" & cell.Row)
+            rngSource2.Copy
+            rngTarget2.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks:=False, Transpose:=False
+        ElseIf cell.Value = "43во" Then
+            ' Вставляем скопированные значения в столбец BF (специальная вставка значений)
+            Set rngTarget3 = wsЛист1.Range("BG" & cell.Row)
+            rngSource3.Copy
+            rngTarget3.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks:=False, Transpose:=False
+        End If
+    Next cell
+End Sub
+

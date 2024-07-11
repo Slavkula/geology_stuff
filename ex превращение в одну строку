@@ -1,8 +1,13 @@
-Sub OdnaStroka()
+Sub Vodnustroku()
+    Dim rng As Range
     Dim cell As Range
-    For Each cell In Range("C1:C" & Cells(Rows.Count, "C").End(xlUp).Row) 
-        If InStr(cell.Value, Chr(10)) > 0 Then 
-            cell.Value = Replace(cell.Value, Chr(10), " ") 
-        End If
+
+    Set rng = Application.Selection
+
+    For Each cell In rng
+        cell.Value = Replace(cell.Value, Chr(10), " ")
+        cell.Value = Replace(cell.Value, Chr(13), " ")
     Next cell
 End Sub
+
+`Выделяем нужные ячейки и включаем макрос

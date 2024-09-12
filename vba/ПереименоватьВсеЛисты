@@ -1,0 +1,19 @@
+Sub ПереименоватьВсеЛисты()
+
+    Dim ws As Worksheet
+    Dim newName As String
+
+    ' Цикл по всем листам в книге
+    For Each ws In ActiveWorkbook.Sheets
+        ' Собираем имя листа из ячеек C3 и H3 с разделителем
+        newName = ws.Cells(3, 3).Value & "-" & ws.Cells(3, 8).Value
+
+        ' Удаляем лишние пробелы в начале и конце имени
+        newName = Trim(newName)
+
+        ' Переименовываем лист
+        ws.Name = newName
+    Next ws
+
+End Sub
+

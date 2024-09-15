@@ -1,0 +1,45 @@
+Sub ReplaceTextInAllDocuments()
+    Dim acadApp As AcadApplication
+    Dim acadDoc As AcadDocument
+    Dim layout As AcadLayout
+    Dim textObj As AcadText
+    Dim mtextObj As AcadMText
+    Dim findText As String
+    Dim replaceText As String
+    Dim obj As Object
+    
+    ' Текст для поиска и замены
+    findText = "Торф пластичномерзлый, льдистый, при"
+    replaceText = "Торф мерзлый, при"
+    
+    ' Получаем ссылку на приложение AutoCAD
+    Set acadApp = ThisDrawing.Application
+    
+    For Each acadDoc In acadApp.Documents
+        For Each layout In acadDoc.Layouts
+            If layout.Name = "А2х4" Then
+                acadDoc.ActiveLayout = layout
+                Exit For
+            End If
+        Next layout
+        
+        For Each obj In acadDoc.PaperSpace
+            If TypeOf obj Is AcadText Then
+                Set textObj = obj
+                If textObj.TextString = findText Then
+                    textObj.TextString = replaceText
+                End If
+            ElseIf TypeOf obj Is AcadMText Then
+                Set mtextObj = obj
+                If InStr(mtextObj.TextString, findText) > 0 Then
+                    mtextObj.TextString = Replace(mtextObj.TextString, findText, replaceText)
+                End If
+            End If
+        Next obj
+        
+        acadDoc.Save
+    Next acadDoc
+    
+    MsgBox "Замена текста завершена во всех открытых документах."
+End Sub
+

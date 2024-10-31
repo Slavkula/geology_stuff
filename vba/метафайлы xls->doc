@@ -79,3 +79,15 @@ Sub ExcelWordMetaPaste()  'метафайлы, в которых надо бра
     Set WordApp = Nothing
 End Sub
 
+Масштабирование метафайлов в ворде. Уменьшаем мету на до 75%
+
+Sub ResizeMetafilesTo75Percent()
+    Dim shp As InlineShape
+    For Each shp In ActiveDocument.InlineShapes
+        If shp.Type = wdInlineShapePicture Or shp.Type = wdInlineShapeLinkedPicture Or shp.Type = wdInlineShapeOLEControlObject Or shp.Type = wdInlineShapeEmbeddedOLEObject Then
+            shp.ScaleHeight = 75
+            shp.ScaleWidth = 75 
+        End If
+    Next shp
+End Sub
+

@@ -1,0 +1,32 @@
+Sub UpdateSpecificFormulas() 'макрос меняет значения формул в указанных ячейках
+    Dim ws As Worksheet
+    Dim cellAddress As Variant
+    Dim formulaText As String
+    Dim startUpdating As Boolean
+    Dim rowNum As Integer
+    Dim matchPos As Integer
+    Dim cellsToUpdate As Variant
+    Dim cellColumn As String
+    
+    cellsToUpdate = Array("M4", "M5", "AB4", "A12", "D12", "G12", "J12", "M12", "P12", "S12", "V12", "Y12", "AB12", "AE12", "AH12")
+    
+    rowNum = 13 ' Начальное значение номера строки
+    startUpdating = False
+    
+    For Each ws In ThisWorkbook.Worksheets
+        If startUpdating Or ws.Name = ActiveSheet.Name Then
+            startUpdating = True
+            For Each cellAddress In cellsToUpdate
+                If Not IsEmpty(ws.Range(cellAddress).MergeArea.Cells(1, 1)) Then
+                    formulaText = ws.Range(cellAddress).MergeArea.Cells(1, 1).Formula
+                    matchPos = InStrRev(formulaText, "!")
+                    If matchPos > 0 Then
+                        cellColumn = Mid(formulaText, matchPos + 1, 1) ' Получаем буквенную часть
+                        ws.Range(cellAddress).MergeArea.Cells(1, 1).Formula = "=Исходник!" & cellColumn & rowNum
+                    End If
+                End If
+            Next cellAddress
+            rowNum = rowNum + 1
+        End If
+    Next ws
+End Sub

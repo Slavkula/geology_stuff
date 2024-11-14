@@ -57,7 +57,7 @@ Sub ExcelWordMetaPaste()  'метафайлы, в которых надо бра
     Set WordDoc = WordApp.ActiveDocument
 
     Dim Ranges As Variant
-    Ranges = Array("A1:L38")
+    Ranges = Array("A1:K60")
     Dim rng As Variant
 
     ' Добавляем цикл для перебора всех листов в книге

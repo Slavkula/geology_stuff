@@ -1,0 +1,45 @@
+Для начала нужно записать через режим разраба два макроса:
+1. В экселе на выделение нужных ячеек, имя макроса: wwwww
+2. В ворде на вставку метафайла, имя aaaa
+
+Sub ExecuteMacrosInExcelAndWord()
+    Dim WordApp As Object
+    Dim WordDoc As Object
+    Dim ws As Worksheet
+
+    On Error Resume Next
+    Set WordApp = GetObject(, "Word.Application")
+    On Error GoTo 0
+
+    If WordApp Is Nothing Then
+        Set WordApp = CreateObject("Word.Application")
+    End If
+
+    If WordApp.Documents.Count = 0 Then
+        MsgBox "Нет открытых документов в Word", vbExclamation
+        Exit Sub
+    End If
+
+    Set WordDoc = WordApp.ActiveDocument
+
+      Application.ScreenUpdating = False
+    Application.EnableEvents = False
+
+    For Each ws In ThisWorkbook.Worksheets
+        ws.Activate
+        
+        Application.Run "wwwww"
+
+        WordApp.Activate
+        WordApp.Run "aaaa"
+        
+        DoEvents
+    Next ws
+
+    Application.ScreenUpdating = True
+    Application.EnableEvents = True
+
+    Set WordDoc = Nothing
+    Set WordApp = Nothing
+
+End Sub

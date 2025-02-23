@@ -1,24 +1,26 @@
 import pandas as pd
 import os
 import tkinter as tk
-from tkinter import filedialog, messagebox
+from tkinter import filedialog, simpledialog
+import time
 
 def select_excel_file():
-    global file_path
-    file_path = filedialog.askopenfilename()
-    if file_path:
-        excel_file_button.config(bg='green')
+    root = tk.Tk()
+    root.withdraw()  
+    file_path = filedialog.askopenfilename(title="Выберите файл Excel", filetypes=[("Excel files", "*.xlsx;*.xls")])
+    return file_path
 
-def select_output_folder():
-    global folder_path
-    folder_path = filedialog.askdirectory()
-    if folder_path:
-        output_folder_button.config(bg='green')
+def select_sheet_number(file_path):
+    df = pd.ExcelFile(file_path)
+    sheet_count = len(df.sheet_names)
+    sheet_number = simpledialog.askinteger("Выбор листа", f"Введите номер листа (1-{sheet_count}):", minvalue=1, maxvalue=sheet_count)
+    return sheet_number
 
-def convert_to_csv():
-    global csv_files_list
+def convert_to_csv(file_path, sheet_number):
+    csv_files_list = []
+    folder_path = os.path.dirname(file_path)
     try:
-        df = pd.read_excel(file_path)  
+        df = pd.read_excel(file_path, sheet_name=sheet_number-1)  
         for i in range(df.shape[1]):
             new_df = df.iloc[:, [0, i]]
             file_name = df.columns[i]
@@ -26,40 +28,38 @@ def convert_to_csv():
             new_df.to_csv(csv_file_path, sep=';', index=False, encoding='utf-8-sig')
             csv_files_list.append(csv_file_path)
     except Exception as e:
-        messagebox.showerror("Ошибка", str(e))
+        print("Ошибка:", str(e))
+    return csv_files_list
 
-def delete_first_line():
+def delete_first_line(csv_files_list):
     for csv_file_path in csv_files_list:
         with open(csv_file_path, 'r', encoding='utf-8') as file:
             lines = file.readlines()
         with open(csv_file_path, 'w', encoding='utf-8') as file:
             file.writelines(lines[1:])
 
-root = tk.Tk()
-root.title("Конвертер Excel в CSV")
+def remove_empty_semicolon_rows(csv_files_list):
+    for csv_file_path in csv_files_list:
+        with open(csv_file_path, 'r', encoding='utf-8') as file:
+            lines = file.readlines()
+        
+        with open(csv_file_path, 'w', encoding='utf-8') as file:
+            for line in lines:
+                if ';' in line and line.strip().endswith(';'):
+                    continue
+                file.write(line)
 
-global csv_files_list
-csv_files_list = []
+file_path = select_excel_file()
+if file_path:
+    sheet_number = select_sheet_number(file_path)
+    if sheet_number:
+        csv_files_list = convert_to_csv(file_path, sheet_number)
+        delete_first_line(csv_files_list)
+        remove_empty_semicolon_rows(csv_files_list)
+        print("Все файлы успешно преобразованы и обработаны.")
+    else:
+        print("Лист не был выбран.")
+else:
+    print("Файл не был выбран.")
 
-file_path = ""
-folder_path = ""
-
-excel_file_button = tk.Button(root, text="Выбрать файл", command=select_excel_file, font=("Arial", 20), height=2, width=30)
-excel_file_button.pack()
-
-output_folder_button = tk.Button(root, text="Выбрать папку", command=select_output_folder, font=("Arial", 20), height=2, width=30)
-output_folder_button.pack()
-
-convert_button = tk.Button(root, text="Преобразовать в CSV", command=convert_to_csv, font=("Arial", 20), height=2, width=30)
-convert_button.pack()
-
-delete_first_line_button = tk.Button(root, text="Удалить первую строку в файлах CSV", command=delete_first_line, font=("Arial", 20), height=2, width=30)
-delete_first_line_button.pack()
-
-text = """
-Пр
-"""
-text_label = tk.Label(root, text=text, font=("Arial", 20))
-text_label.pack()
-
-root.mainloop()
+time.sleep(30)

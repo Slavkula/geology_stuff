@@ -1,0 +1,77 @@
+import openpyxl
+from tkinter import Tk, Label, Entry, Button, messagebox, font
+import win32com.client  
+
+def process_data():
+    try:
+        row_range = row_entry.get().strip()
+        col_range = col_entry.get().strip()
+
+        if not row_range:
+            raise ValueError("Диапазон строк не был введён.")
+        if not col_range:
+            raise ValueError("Диапазон столбцов не был введён.")
+
+        row_start, row_end = map(int, row_range.split('-'))
+
+        col_start, col_end = col_range.split('-')
+
+        def col_to_num(col):
+            num = 0
+            for char in col:
+                num = num * 26 + (ord(char.upper()) - ord('A') + 1)
+            return num
+
+        col_start_num = col_to_num(col_start)
+        col_end_num = col_to_num(col_end)
+
+        excel = win32com.client.Dispatch("Excel.Application")
+        workbook = excel.ActiveWorkbook  
+        if not workbook:
+            raise Exception("Не удалось найти открытый файл Excel.")
+
+        worksheet = workbook.ActiveSheet
+
+        for row in range(row_start, row_end + 1):
+            for col in range(col_start_num, col_end_num + 1):
+                cell = worksheet.Cells(row, col)
+                if cell.Value is None:  
+                    cell.Value = 0  
+                    cell.Font.Color = 0xFFFFFF  
+        messagebox.showinfo("Готово", "Обработка завершена. Изменения применены к открытому файлу.")
+
+    except Exception as e:
+        print(f"Произошла ошибка: {e}")
+        messagebox.showerror("Ошибка", f"Произошла ошибка: {e}")
+
+
+    row_entry.delete(0, 'end')
+    col_entry.delete(0, 'end')
+
+
+def create_input_window():
+    global row_entry, col_entry
+
+
+    root = Tk()
+    root.title("Белые нули")
+
+
+    root.geometry("650x180")  
+
+
+    custom_font = font.Font(size=16)  
+    Label(root, text="Диапазон строк (например, 1-10):", font=custom_font).grid(row=0, column=0, padx=10, pady=10)
+    row_entry = Entry(root, font=custom_font)
+    row_entry.grid(row=0, column=1, padx=10, pady=10)
+
+    Label(root, text="Диапазон столбцов (например, A-C):", font=custom_font).grid(row=1, column=0, padx=10, pady=10)
+    col_entry = Entry(root, font=custom_font)
+    col_entry.grid(row=1, column=1, padx=10, pady=10)
+
+    Button(root, text="Добавить", font=custom_font, command=process_data).grid(row=2, column=0, columnspan=2, pady=20)
+
+    root.mainloop()
+
+create_input_window()
+print("Программа завершена.")

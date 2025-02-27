@@ -1,118 +1,63 @@
-import win32com.client
+import win32com.client as win32
 import tkinter as tk
-from tkinter import filedialog, simpledialog
-
-def run_macro():
-    file_path = file_path_var.get()
-    start_value = start_var.get()
-    end_value = end_var.get()
-    bf_value = bf_var.get()
-    a_value = a_var.get()
-    if file_path and start_value and end_value and bf_value and a_value:
-        xl = win32com.client.Dispatch("Excel.Application")
-        xl.Visible = True 
-        wb = xl.Workbooks.Open(file_path)
-        ws = wb.ActiveSheet
-
-        macro_code = f"""
-        Sub CustomLoop()
-            Dim ws As Worksheet
-            Dim i As Long
-            Set ws = ActiveSheet
-
-            For i = {start_value} To {end_value}
-                Dim originalValue As Variant
-                Dim adjustedValue As Double
-                Dim bfValue As Double
-
-                originalValue = ws.Cells(i, "{a_value}").Value
-                If IsNumeric(originalValue) Then
-                    adjustedValue = 100 - originalValue
-                    bfValue = ws.Cells(i, "{bf_value}").Value
-                    ws.Cells(i, "{bf_value}").Value = bfValue + adjustedValue
-                End If
-            Next i
-        End Sub
-        """
-
-        xlmodule = wb.VBProject.VBComponents.Add(1)
-        xlmodule.CodeModule.AddFromString(macro_code)
+from tkinter import messagebox
 
 
-        xl.Run("CustomLoop")
+def process_data():
+    try:
+        col_I = entry_col_I.get().upper()  
+        col_BK = entry_col_BK.get().upper()
+        start_row = int(entry_start_row.get())
+        end_row = int(entry_end_row.get())
 
+        excel = win32.GetObject(Class="Excel.Application")
+        workbook = excel.ActiveWorkbook
+        sheet = workbook.ActiveSheet
 
-        wb.Save()
-        #xl.Quit()
+        for row in range(start_row, end_row + 1):
+            # Получаем значение из столбца I
+            cell_I = sheet.Cells(row, sheet.Columns(col_I).Column)
+            value_I = cell_I.Value
 
-        result_label.config(text="Макрос успешно выполнен")
-    else:
-        result_label.config(text="Путь к файлу или значения для цикла не указаны")
+            if not isinstance(value_I, (int, float)):
+                continue
 
-def select_file():
-    file_path = filedialog.askopenfilename(filetypes=[("Excel Files", "*.xlsx")])
-    if file_path:
-        file_path_var.set(file_path)
-        result_label.config(text="")
-        select_button.config(bg="green")  
+            if value_I != 100:
+                difference = 100 - value_I
 
+                cell_BK = sheet.Cells(row, sheet.Columns(col_BK).Column)
+                value_BK = cell_BK.Value if isinstance(cell_BK.Value, (int, float)) else 0
+
+                new_value_BK = value_BK + difference
+                cell_BK.Value = new_value_BK
+
+    except Exception as e:
+        messagebox.showerror("Ошибка", f"Произошла ошибка: {e}")
 
 root = tk.Tk()
-root.title("Убрать красные числа")
-root.option_add('*Font', 'Helvetica 20')  
+root.title("Убрать красные")
 
-file_path_var = tk.StringVar()
-start_var = tk.StringVar()
-end_var = tk.StringVar()
-bf_var = tk.StringVar()
-a_var = tk.StringVar()
+tk.Label(root, text="Столбец с красными:").grid(row=0, column=0, padx=10, pady=10)
+entry_col_I = tk.Entry(root)
+entry_col_I.grid(row=0, column=1, padx=10, pady=10)
+entry_col_I.insert(0, "")  # Значение по умолчанию
 
-file_label = tk.Label(root, text="Выберите файл Excel:", font=('Helvetica', 20))  
-file_label.pack(pady=20)
+tk.Label(root, text="Столбец для замены:").grid(row=1, column=0, padx=10, pady=10)
+entry_col_BK = tk.Entry(root)
+entry_col_BK.grid(row=1, column=1, padx=10, pady=10)
+entry_col_BK.insert(0, "")  # Значение по умолчанию
 
-select_button = tk.Button(root, text="Выбрать файл", command=select_file, font=('Helvetica', 20))  
-select_button.pack()
+tk.Label(root, text="Начать на строке:").grid(row=2, column=0, padx=10, pady=10)
+entry_start_row = tk.Entry(root)
+entry_start_row.grid(row=2, column=1, padx=10, pady=10)
+entry_start_row.insert(0, "")  # Значение по умолчанию
 
-start_frame = tk.Frame(root)  
-start_frame.pack(pady=20)
+tk.Label(root, text="Закончить на строке:").grid(row=3, column=0, padx=10, pady=10)
+entry_end_row = tk.Entry(root)
+entry_end_row.grid(row=3, column=1, padx=10, pady=10)
+entry_end_row.insert(0, "")  # Значение по умолчанию
 
-start_label = tk.Label(start_frame, text="Начало:", font=('Helvetica', 20))  
-start_label.pack(side="left")
-
-start_entry = tk.Entry(start_frame, textvariable=start_var, width=5, font=('Helvetica', 20))  
-start_entry.pack(side="right")
-
-end_frame = tk.Frame(root)  
-end_frame.pack(pady=20)
-
-end_label = tk.Label(end_frame, text="Конец:", font=('Helvetica', 20))  
-end_label.pack(side="left")
-
-end_entry = tk.Entry(end_frame, textvariable=end_var, width=5, font=('Helvetica', 20))  
-end_entry.pack(side="right")
-
-bf_frame = tk.Frame(root)  
-bf_frame.pack(pady=20)
-
-bf_label = tk.Label(bf_frame, text="Делать замены в столбце:", font=('Helvetica', 20))  
-bf_label.pack(side="left")
-
-bf_entry = tk.Entry(bf_frame, textvariable=bf_var, width=5, font=('Helvetica', 20))  
-bf_entry.pack(side="right")
-
-a_frame = tk.Frame(root)  
-a_frame.pack(pady=20)
-
-a_label = tk.Label(a_frame, text="Красные числа в столбце:", font=('Helvetica', 20))  
-a_label.pack(side="left")
-
-a_entry = tk.Entry(a_frame, textvariable=a_var, width=5, font=('Helvetica', 20))  
-a_entry.pack(side="right")
-
-run_button = tk.Button(root, text="Запустить макрос", command=run_macro, font=('Helvetica', 20))  
-run_button.pack(pady=20)
-
-result_label = tk.Label(root, text="", font=('Helvetica', 20))  
-result_label.pack()
+btn_process = tk.Button(root, text="Обработать", command=process_data)
+btn_process.grid(row=4, column=0, columnspan=2, pady=10)
 
 root.mainloop()
